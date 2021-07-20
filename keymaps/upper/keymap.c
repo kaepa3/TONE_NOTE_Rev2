@@ -15,19 +15,49 @@
  */
 #include QMK_KEYBOARD_H
 
+enum custom_keycodes {
+  BACKING = SAFE_RANGE,
+  REVERT,
+};
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT( 
-        C(S(KC_E)), S(KC_TAB),  KC_TAB,      KC_0,
-        KC_LSFT,    C(KC_LEFT), C(KC_RIGHT), C(KC_Z)
+        BACKING, REVERT, KC_SPACE, KC_LALT,
+        KC_B, KC_E, KC_S, KC_V
     )
 };
 
 /* Rotary encoder settings */
 bool encoder_update_user(uint8_t index, bool clockwise) {
    if (clockwise) {
-        tap_code(KC_UP);    //Rotary encoder clockwise
+        tap_code(KC_RBRC);    //Rotary encoder clockwise
     } else {
-        tap_code(KC_DOWN);  //Rotary encoder Reverse clockwise
+        tap_code(KC_LBRC);  //Rotary encoder Reverse clockwise
     }
     return true;
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  switch (keycode) {
+    case BACKING:
+       if (record->event.pressed) {
+         register_code(KC_LGUI);
+         register_code(KC_Z);
+       } else {
+         unregister_code(KC_LGUI);
+         unregister_code(KC_Z);
+       }
+       break;
+    case REVERT:
+       if (record->event.pressed) {
+         register_code(KC_LGUI);
+         register_code(KC_LSHIFT);
+         register_code(KC_Z);
+       } else {
+         unregister_code(KC_LGUI);
+         unregister_code(KC_LSHIFT);
+         unregister_code(KC_Z);
+       }
+       break;
+  }
+  return true;
 }
